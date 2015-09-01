@@ -10,21 +10,40 @@ var message = {
 };
 
 var removeTags = function(message){
+  if(message!==null){
 
   message = message.replace(/</g, "");
   message = message.replace(/>/g, "");
+}
 
   return message;
 };
 
 
 
+$('#create').click(function(){
+
+  var x = document.getElementById("room");
+  var option = document.createElement("option");
+  option.text = $('#newRoom').val();
+  x.add(option);
+  $('#newRoom').val('');
+
+
+
+
+
+
+});
+
+
+
+
+
  $(".friend").on('click', function(){
-  console.log("clicked");
   var whole = $(this).text();
   var friendname = whole.slice(0,whole.indexOf(":"));
   friendname = removeTags(friendname);
-  console.log(friendname);
   if (friends[friendname] === undefined) {
     friends[friendname] = true;
   }
@@ -96,7 +115,7 @@ function getMessages(){
         if (room !== undefined) {
           room = removeTags(room);
         }
-        console.log('selectedRoom: ' + selectedRoom + "     room: " + room);
+        //console.log('selectedRoom: ' + selectedRoom + "     room: " + room);
         if (selectedRoom === 'all' || selectedRoom === room) {
           var name = data.results[i].username || 'anonymous';
           var newMessage = $('<div></div>');
@@ -108,6 +127,7 @@ function getMessages(){
           }
           if(friends.hasOwnProperty(name)){
             name = '<strong>'+ name +'</strong>';
+            text = '<strong>'+ text +'</strong>';
           }
           newMessage.html(name  +": "+ text);
           $('#chats').append(newMessage);
