@@ -1,12 +1,36 @@
 
 
-var roomNames = {
+var friends = {
+
 
 };
 
 var message = {
 
 };
+
+var removeTags = function(message){
+
+  message = message.replace(/</g, "");
+  message = message.replace(/>/g, "");
+
+  return message;
+};
+
+
+
+ $(".friend").on('click', function(){
+  console.log("clicked");
+  var whole = $(this).text();
+  var friendname = whole.slice(0,whole.indexOf(":"));
+  friendname = removeTags(friendname);
+  console.log(friendname);
+  if (friends[friendname] === undefined) {
+    friends[friendname] = true;
+  }
+});
+
+
 
 
 
@@ -19,7 +43,7 @@ $('#sendbutton').click(function() {
   message.text = $('#input').val();
   //message.roomname = "newroom";
 
-  message.roomname = 'myroom';
+  message.roomname = $('select option:selected').text();
 
 
   $('#input').val('');
@@ -53,7 +77,7 @@ $('#sendbutton').click(function() {
 //   var text = $('#message').val();
 //   console.log(text);
 //   alert(text);
-// },3500)
+// },3500);
 
 
 
@@ -67,12 +91,27 @@ function getMessages(){
     contentType: 'application/json',
     success: function (data) {
       for(var i = 0; i<data.results.length; i++){
-        var name = data.results[i].username || 'anonymous';
-        var newMessage = $('<div></div>');
-        newMessage.addClass('chat');
-        newMessage.text(name+" : "+ data.results[i].text);
-        $('#chats').append(newMessage);
-        
+        var selectedRoom = $('select option:selected').text();
+        var room = data.results[i].roomname;
+        if (room !== undefined) {
+          room = removeTags(room);
+        }
+        console.log('selectedRoom: ' + selectedRoom + "     room: " + room);
+        if (selectedRoom === 'all' || selectedRoom === room) {
+          var name = data.results[i].username || 'anonymous';
+          var newMessage = $('<div></div>');
+          newMessage.addClass('friend');
+          newMessage.addClass('chat');
+          name = removeTags(name);
+          if(data.results[i].text!==null && data.results[i].text !== undefined ){
+            var text = removeTags(data.results[i].text);
+          }
+          if(friends.hasOwnProperty(name)){
+            name = '<strong>'+ name +'</strong>';
+          }
+          newMessage.html(name  +": "+ text);
+          $('#chats').append(newMessage);
+        }
       }
     },
     error: function (data) {
@@ -90,8 +129,16 @@ function getMessages(){
  setInterval(function() {
   cleanup();
   getMessages();
+
   }
   , 3000);
 
+
+
+
+
+
+
+    
 
 

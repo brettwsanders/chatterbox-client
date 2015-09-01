@@ -5,6 +5,10 @@ body {
     font-family: arial, sans-serif;
 }
 
+body{
+    background-image: url("http://dreamatico.com/data_images/beach/beach-6.jpg");
+}
+
 #main, #chats {
     width: 500px;
     margin: auto;
