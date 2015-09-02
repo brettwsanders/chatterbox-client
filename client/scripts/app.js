@@ -4,8 +4,10 @@ var friends = {
 
 
 };
+var message = {};
 
-var message = {
+
+var messages = {
 
 };
 
@@ -14,12 +16,12 @@ var removeTags = function(message){
 
   message = message.replace(/</g, "");
   message = message.replace(/>/g, "");
+  message = message.replace('<strong>');
+  message = message.replace('</strong>');
 }
 
   return message;
 };
-
-
 
 $('#create').click(function(){
 
@@ -31,26 +33,48 @@ $('#create').click(function(){
 
 
 
-
-
-
 });
 
 
 
 
 
- $(".friend").on('click', function(){
-  var whole = $(this).text();
-  var friendname = whole.slice(0,whole.indexOf(":"));
-  friendname = removeTags(friendname);
-  if (friends[friendname] === undefined) {
-    friends[friendname] = true;
-  }
-});
+
+var runover = function(that){
+  var text = $(that).text();
+  var name = text.slice(0, text.indexOf(':'));
+  friends[name]=true;
+  //that.innerHTML = "<strong>" + text + "<strong>";
+
+  // console.log(whole);
+  // var friendname = whole.slice(0,whole.indexOf(":"));
+  // if(!friends[friendname]){
+  //   friends[friendname]=true;
+
+  // var el = document.getElementsByClassName('friend');
+
+
+  // for(var i = 0; i<el.length; i++){
+  
+  //  console.log($(this).text());
+  //   var whole = $(this).text();
+    
+  //   var name = whole.slice(0,whole.indexOf(":"));
+  //   if(name===friendname){
+  //     name = '<strong  >'+ name +'</strong>';
+
+  //   }
+  //   }
+
+    
+  // }
+
+};
 
 
 
+
+  
 
 
 $('#sendbutton').click(function() {
@@ -73,7 +97,7 @@ $('#sendbutton').click(function() {
   // // message.username = username;
   // message.roomname = roomname;
   // console.log(message);
-  message.username = prompt('your name my friend');
+  message.username = window.location.search.substr(10);
   console.log(message);
   $.ajax({// This is the url you should use to communicate with the parse API server.
     url: 'https://api.parse.com/1/classes/chatterbox',
@@ -101,7 +125,7 @@ $('#sendbutton').click(function() {
 
 
 
-function getMessages(){
+function getMessages(string){
 
    $.ajax({// This is the url you should use to communicate with the parse API server.
     url: 'https://api.parse.com/1/classes/chatterbox',
@@ -118,22 +142,35 @@ function getMessages(){
         //console.log('selectedRoom: ' + selectedRoom + "     room: " + room);
         if (selectedRoom === 'all' || selectedRoom === room) {
           var name = data.results[i].username || 'anonymous';
-          var newMessage = $('<div></div>');
+          var newMessage = $('<p></p>');
+          newMessage.on('click', function() {runover(this)});
           newMessage.addClass('friend');
           newMessage.addClass('chat');
           name = removeTags(name);
           if(data.results[i].text!==null && data.results[i].text !== undefined ){
-            var text = removeTags(data.results[i].text);
+          var text = removeTags(data.results[i].text);
+
           }
           if(friends.hasOwnProperty(name)){
             name = '<strong>'+ name +'</strong>';
             text = '<strong>'+ text +'</strong>';
           }
-          newMessage.html(name  +": "+ text);
-          $('#chats').append(newMessage);
+          text = removeTags(text);
+          
+          if(!messages.hasOwnProperty(text)){
+            var d = new Date().getMinutes();
+            newMessage.html(name  +": "+ text+' '+ d);
+            console.log(d);
+            if (string === 'append') {
+              $('#chats').append(newMessage);
+            } else {
+              $('#chats').prepend(newMessage);
+              }              
+             messages[text]=true;
+            }
+         }
         }
-      }
-    },
+      },
     error: function (data) {
       // See: https://developer.mozilla.org/en-US/docs/Web/API/console.error
       console.error('chatterbox: Failed to send message');
@@ -141,17 +178,18 @@ function getMessages(){
   });
  };
 
+
  var cleanup = function(){
   $('#chats').html('');
  };
  
 
- setInterval(function() {
-  cleanup();
-  getMessages();
+getMessages('append');
+setInterval(function() {
+getMessages('prepend');
 
-  }
-  , 3000);
+
+}, 3000);
 
 
 
