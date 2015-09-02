@@ -16,8 +16,8 @@ var removeTags = function(message){
 
   message = message.replace(/</g, "");
   message = message.replace(/>/g, "");
-  message = message.replace('<strong>');
-  message = message.replace('</strong>');
+  message = message.replace('strong', '');
+  message = message.replace('/strong', '');
 }
 
   return message;
@@ -155,11 +155,12 @@ function getMessages(string){
             name = '<strong>'+ name +'</strong>';
             text = '<strong>'+ text +'</strong>';
           }
-          text = removeTags(text);
+           text = removeTags(text);
           
           if(!messages.hasOwnProperty(text)){
             var d = new Date().getMinutes();
-            newMessage.html(name  +": "+ text+' '+ d);
+            newMessage.html(name  +": "+ '<strong>'+ text +'</strong>' +' '+ d);
+          
             console.log(d);
             if (string === 'append') {
               $('#chats').append(newMessage);
